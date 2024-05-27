@@ -1,4 +1,4 @@
-[Русский](README_ru.md)
+[Русский](README_ru.MD)
 
 If you don't want to enter OpenAI API key each time, you can add new line into .env
 file in root directory like this:

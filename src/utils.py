@@ -20,10 +20,10 @@ def parse_time_to_hhmmss(time: int) -> str:
 
 
 def parse_time_to_seconds(time: str) -> int:
-    time_list = time.split(":")
-    if len(time_list) == 3:
-        return int(time_list[0]) * 3600 + int(time_list[1]) * 60 + int(time_list[2])
-    return int(time_list[0]) * 60 + int(time_list[1])
+    time_parts = time.split(":")
+    if len(time_parts) == 3:
+        return int(time_parts[0]) * 3600 + int(time_parts[1]) * 60 + int(time_parts[2])
+    return int(time_parts[0]) * 60 + int(time_parts[1])
 
 
 def video_info(youtube_url: str) -> Tuple:
