@@ -1,1 +1,4 @@
 # Project exclude paths
+/runtimes/
+.dockerignore
+.gitignore

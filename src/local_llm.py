@@ -1,7 +1,9 @@
 # This file contains code for run local LLM
 from src.utils import summary_prompt
 
+
 # # Example with GPT4All
+#
 # from gpt4all import GPT4All
 #
 #
@@ -10,7 +12,9 @@ from src.utils import summary_prompt
 #     output = model.generate(summary_prompt(input_text), max_tokens=1024, temp=0.6)
 #     return output
 
+
 # Example with HuggingFace
+#
 # import os
 # from transformers import AutoTokenizer, AutoModelForCausalLM
 #

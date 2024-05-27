@@ -1,24 +1,51 @@
 import os
-
-from openai import OpenAI
 import torch.cuda
 import whisper
+from typing import Tuple
+from openai import OpenAI
 from moviepy.editor import AudioFileClip
 from pytube import YouTube
 
 
-def video_title(youtube_url: str) -> str:
+def parse_time_to_hhmmss(time: int) -> str:
+    hours = time // 3600
+    time -= 3600 * hours
+    minutes = time // 60
+    seconds = time - 60 * minutes
+    if hours == 0:
+        if minutes == 0:
+            return f"00:{seconds:02}"
+        return f"{minutes:02}:{seconds:02}"
+    return f"{hours:02}:{minutes:02}:{seconds:02}"
+
+
+def parse_time_to_seconds(time: str) -> int:
+    time_list = time.split(":")
+    if len(time_list) == 3:
+        return int(time_list[0]) * 3600 + int(time_list[1]) * 60 + int(time_list[2])
+    return int(time_list[0]) * 60 + int(time_list[1])
+
+
+def video_info(youtube_url: str) -> Tuple:
     """
-    Retrieve the title of a YouTube video.
+    Retrieve information of a YouTube video.
 
     Examples
     --------
-    title = video_title("https://www.youtube.com/watch?v=XxCZC5dF8D8")
-    print(title)
-    'Sample Video Title'
+    videoId, videoTitle, videoLength = video_info("https://www.youtube.com/watch?v=XxCZC5dF8D8")
     """
     yt = YouTube(youtube_url)
-    return yt.title
+    return yt.video_id, yt.title, yt.length
+
+
+def trim_video(path_to_file: str, path_to_trimmed: str, timing: Tuple[str, str]) -> None:
+    file = AudioFileClip(path_to_file)
+    start_time, end_time = timing
+    if end_time == "":
+        v = file.subclip(start_time)
+    else:
+        v = file.subclip(start_time, end_time)
+    v.write_audiofile(path_to_trimmed, codec='mp3')
 
 
 def download_audio(youtube_url: str, download_path: str) -> None:
@@ -58,7 +85,12 @@ def transcribe(file_path: str, model_name="medium") -> str:
     print(text)
     'This text explains...'
     """
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    if torch.cuda.is_available():
+        device = "cuda"
+    elif torch.backends.mps.is_available():
+        device = "mps"
+    else:
+        device = "cpu"
     print(f"Transcribe using device {device}")
     model = whisper.load_model(model_name, device=device)
     result = model.transcribe(file_path)
@@ -99,7 +131,7 @@ def summarize_openai_text(input_text: str, model: str = "gpt-3.5-turbo", api_key
                 "content": summary_prompt(input_text),
             }
         ],
-        temperature=0.8,  # Уровень случайности вывода модели
+        temperature=0.6,  # Уровень случайности вывода модели
 
     )
     # Return response
