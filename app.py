@@ -6,6 +6,7 @@ import src.local_llm as local_llm
 from src.utils import convert_mp4_to_mp3, download_audio, summarize_openai_text, transcribe, \
     trim_video, video_info, parse_time_to_hhmmss, parse_time_to_seconds
 from dotenv import load_dotenv
+from urllib.error import HTTPError
 
 
 # Function to save configuration to file
@@ -32,11 +33,11 @@ def main():
         with st.expander("Настройки", False):
             # Voice transcribe model selector
             whisper_model_select = st.selectbox("Выберите модель для распознавания аудио",
-                                                ("small", "small.en", "medium", "medium.en", "large"),
-                                                index=2,
+                                                ("turbo", "small", "medium", "large"),
+                                                index=0,
                                                 key='whisper_model_select')
-            # Checkbox for turn off summary (transcribe only mode)
-            summarize_checkbox = st.checkbox("Суммировать текст", value=True)
+            # Checkbox for turn off summary (transcribe only mode) # TEXT SUMMARY
+            summarize_checkbox = st.checkbox("Суммировать текст", value=False)
             if summarize_checkbox:
                 # Summary method selector
                 summary_method_select = st.selectbox("Выберите модель для суммаризации текста",
@@ -65,6 +66,11 @@ def main():
                         st.error("Необходимо импортировать в проект локальные LLM модели, образец "
                                  "находится в файле local_llm.py")
                         st.stop()
+            use_proxy = st.checkbox("Использовать прокси", value=True)
+            if use_proxy:
+                proxy_address = st.text_input("Прокси", "193.9.126.64:64040", help="Напишите адрес прокси в формате IP:PORT, например: 127.0.0.1:8080", key="proxy_address")
+                proxy_login = st.text_input("Логин", "byhxfRmZ", help="Логин для прокси (если нужно)", key="proxy_login")
+                proxy_password = st.text_input("Пароль", "FgeEz1jk", help="Пароль для прокси (если нужно)", key="proxy_password", type="password")
 
         # Paste url to youtube video
         youtube_url = st.text_input("Вставьте ссылку на видеоролик в youtube:")
@@ -79,8 +85,24 @@ def main():
                         st.stop()
                     else:
                         openai_api_key = openai_api_key_input
+            # Parse proxy settings
+            if use_proxy:
+                if not re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{1,5}$", proxy_address):
+                    st.error("Введите корректный адрес прокси в формате IP:PORT, например 127.0.0.1:8080")
+                    st.stop()
+                if proxy_login and proxy_password:
+                    proxy_str = f"http://{proxy_login}:{proxy_password}@{proxy_address}"
+                else:
+                    proxy_str = f"http://{proxy_address}"
+            else:
+                proxy_str = None
             # Get information about video
-            file_name, video_title, video_length = video_info(youtube_url)
+            try:
+                file_name, video_title, video_length = video_info(youtube_url, proxy_str)
+            except Exception as e:
+                print(e)
+                st.error(e)
+                st.stop()
 
             # Create checkbox for clip video
             clip_video = st.checkbox("Обрезать видео")
@@ -128,9 +150,16 @@ def main():
                         convert_path = f"runtimes/{file_name}_clip.mp3"
                         timing = start_time, end_time if end_time != parsed_length or end_time != "" else ""
                         trim_video(original_path, convert_path, timing)
+                except HTTPError as e:
+                    print(f"Error: {e}")
+                    st.error(e)
+                    transcribe_button.empty()
+                    progress_placeholder.empty()
+                    st.stop()
                 except Exception as e:
-                    print(e)
-                    print(e.args)
+                    print(f"Error: {e}")
+                    print(f"type: {type(e)}")
+                    print(f"e.args: {e.args}")
                     st.error("Пожалуйста, предоставьте корректную ссылку на видео!")
                     transcribe_button.empty()
                     progress_placeholder.empty()

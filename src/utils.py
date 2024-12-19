@@ -26,7 +26,7 @@ def parse_time_to_seconds(time: str) -> int:
     return int(time_parts[0]) * 60 + int(time_parts[1])
 
 
-def video_info(youtube_url: str) -> Tuple:
+def video_info(youtube_url: str, proxy=None) -> Tuple:
     """
     Retrieve information of a YouTube video.
 
@@ -34,7 +34,10 @@ def video_info(youtube_url: str) -> Tuple:
     --------
     videoId, videoTitle, videoLength = video_info("https://www.youtube.com/watch?v=XxCZC5dF8D8")
     """
-    yt = YouTube(youtube_url)
+    if proxy:
+        yt = YouTube(youtube_url, proxies={"http": proxy, "https": proxy})
+    else:
+        yt = YouTube(youtube_url)
     return yt.video_id, yt.title, yt.length
 
 
@@ -48,7 +51,7 @@ def trim_video(path_to_file: str, path_to_trimmed: str, timing: Tuple[str, str])
     v.write_audiofile(path_to_trimmed, codec='mp3')
 
 
-def download_audio(youtube_url: str, download_path: str) -> None:
+def download_audio(youtube_url: str, download_path: str, proxy=None) -> None:
     """
     Download the audio from a YouTube video.
 
@@ -56,7 +59,10 @@ def download_audio(youtube_url: str, download_path: str) -> None:
     --------
     download_audio("https://www.youtube.com/watch?v=XxCZC5dF8D8", "audio.mp4")
     """
-    yt = YouTube(youtube_url)
+    if proxy:
+        yt = YouTube(youtube_url, proxies={"http": proxy, "https": proxy})
+    else:
+        yt = YouTube(youtube_url)
     path, filename = os.path.split(download_path)
     yt.streams.filter(only_audio=True, mime_type='audio/mp4').first().download(path, filename)
 
