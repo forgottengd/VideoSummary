@@ -7,3 +7,4 @@ ffmpeg==1.4
 openai==1.51.0
 streamlit==1.39.0
 python-dotenv==1.0.1
+aiogram==3.15.0
