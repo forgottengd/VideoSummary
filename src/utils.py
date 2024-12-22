@@ -5,7 +5,17 @@ from typing import Tuple
 from openai import OpenAI
 from moviepy.editor import AudioFileClip
 from pytube import YouTube
+from pytube.request import stream
 
+
+def is_youtube_url(url: str) -> bool:
+    if url.startswith("https://www.youtube.com/watch?v=") or \
+        url.startswith("https://www.youtube.com/shorts/") or \
+        url.startswith("www.youtube.com/watch?v=") or \
+        url.startswith("https://youtube.com/watch?v=") or \
+        url.startswith("https://youtu.be/"):
+        return True
+    return False
 
 def parse_time_to_hhmmss(time: int) -> str:
     hours = time // 3600
