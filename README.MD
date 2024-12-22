@@ -1,6 +1,6 @@
 [Русский](README_ru.MD)
 
-If you don't want to enter OpenAI API key each time, you can add new line into .env
+If you don't want to enter OpenAI API key each time, you need add new line into .env
 file in root directory like this:
 OPEN_AI_KEY = 'your_key'
 
@@ -16,3 +16,8 @@ To solve transcribe's problem "file not found" on Windows:
 
 For using local LLM you need to write function 'summarize_local' for using your 
 model in src/local_llm.py. This file contains examples
+
+To run telegram bot you need add new line into .env:
+BOT_TOKEN = 'token'
+and run next command:
+python main.py
