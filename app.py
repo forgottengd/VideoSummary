@@ -68,9 +68,12 @@ def main():
                         st.stop()
             use_proxy = st.checkbox("Использовать прокси", value=True)
             if use_proxy:
-                proxy_address = st.text_input("Прокси", "45.128.73.203:63363", help="Напишите адрес прокси в формате IP:PORT, например: 127.0.0.1:8080", key="proxy_address")
-                proxy_login = st.text_input("Логин", "byhxfRmZ", help="Логин для прокси (если нужно)", key="proxy_login")
-                proxy_password = st.text_input("Пароль", "FgeEz1jk", help="Пароль для прокси (если нужно)", key="proxy_password", type="password")
+                proxy = os.getenv("PROXY_VS", default="")
+                login = os.getenv("PROXY_VS_LOGIN", default="")
+                password = os.getenv("PROXY_VS_PASSWORD", default="")
+                proxy_address = st.text_input("Прокси", proxy, help="Напишите адрес прокси в формате IP:PORT, например: 127.0.0.1:8080", key="proxy_address")
+                proxy_login = st.text_input("Логин", login, help="Логин для прокси (если нужно)", key="proxy_login")
+                proxy_password = st.text_input("Пароль", password, help="Пароль для прокси (если нужно)", key="proxy_password", type="password")
 
         # Paste url to youtube video
         youtube_url = st.text_input("Вставьте ссылку на видеоролик в youtube:")

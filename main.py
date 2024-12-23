@@ -15,7 +15,10 @@ from dotenv import load_dotenv
 
 
 load_dotenv()
-proxy = "http://byhxfRmZ:FgeEz1jk@45.128.73.203:63362"
+proxy = os.getenv("PROXY_VS")
+login = os.getenv("PROXY_VS_LOGIN")
+password = os.getenv("PROXY_VS_PASSWORD")
+proxy = f"http://{login}:{password}@{proxy}"
 ydl_opts = {
     'proxy' : proxy,
 }
