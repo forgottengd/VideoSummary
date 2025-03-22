@@ -3,7 +3,7 @@ import torch.cuda
 import whisper
 from typing import Tuple
 from openai import OpenAI
-from moviepy.editor import AudioFileClip
+from moviepy import AudioFileClip
 from pytube import YouTube
 from pytube.request import stream
 
@@ -55,9 +55,9 @@ def trim_video(path_to_file: str, path_to_trimmed: str, timing: Tuple[str, str])
     file = AudioFileClip(path_to_file)
     start_time, end_time = timing
     if end_time == "":
-        v = file.subclip(start_time)
+        v = file.subclipped(start_time)
     else:
-        v = file.subclip(start_time, end_time)
+        v = file.subclipped(start_time, end_time)
     v.write_audiofile(path_to_trimmed, codec='mp3')
 
 
